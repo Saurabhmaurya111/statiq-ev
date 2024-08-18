@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:spark/current_location.dart';
 
 
 void main() {
+
   runApp(const MyApp());
 }
 
@@ -12,6 +14,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // Transparent status bar
+      statusBarIconBrightness: Brightness.dark, // Dark icons for light backgrounds
+    ));
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,

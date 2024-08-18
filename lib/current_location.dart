@@ -64,7 +64,10 @@ class _CurrentLocationState extends State<CurrentLocation> {
     return Scaffold(
       body: Stack(
         children: [
-          SearchScreen(),
+          const Positioned(
+            top: 0,
+            child: SearchScreen()
+            ),
           GoogleMap(
             initialCameraPosition: _kGooglePlex,
             zoomControlsEnabled: false,
