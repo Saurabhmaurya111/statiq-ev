@@ -15,7 +15,6 @@ class CurrentLocation extends StatefulWidget {
 }
 
 class _CurrentLocationState extends State<CurrentLocation> {
-    
   final Completer<GoogleMapController> _controller = Completer();
   static const _kGooglePlex = CameraPosition(
     target: LatLng(28.375724999658214, 79.45794690859752),
@@ -61,7 +60,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
 
   @override
   Widget build(BuildContext context) {
-  final Size screenSize = MediaQuery.of(context).size;
+    final Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
         children: [
@@ -74,19 +73,12 @@ class _CurrentLocationState extends State<CurrentLocation> {
               _controller.complete(controller);
             },
           ),
-       
           Positioned(
-           
             bottom: 0,
             left: 0,
             right: 0,
-          
-            child: NearbyList(
-
-            ),
+            child: NearbyList(),
           ),
-
-          
         ],
       ),
     );
