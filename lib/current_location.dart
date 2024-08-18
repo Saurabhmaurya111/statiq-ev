@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:spark/filter_page.dart';
 import 'package:spark/nearby_list.dart';
-import 'package:spark/searchScreen.dart';
 
 class CurrentLocation extends StatefulWidget {
   const CurrentLocation({super.key});
@@ -44,6 +44,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
     });
   }
 
+  @override
   void initState() {
     super.initState();
     loadData();
@@ -64,10 +65,6 @@ class _CurrentLocationState extends State<CurrentLocation> {
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned(
-            top: 0,
-            child: SearchScreen()
-            ),
           GoogleMap(
             initialCameraPosition: _kGooglePlex,
             zoomControlsEnabled: false,
@@ -77,12 +74,102 @@ class _CurrentLocationState extends State<CurrentLocation> {
             },
           ),
           Positioned(
+            top: 50, // Adjust the position as needed
+            left: 20,
+            right: 20,
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              SearchScreen()), // Ensure you have this screen
+                    );
+                  },
+                  child: Container(
+                    width: screenSize.width * 0.7,
+                    height: screenSize.height * 0.0656,
+                    margin: EdgeInsets.only(left: 0),
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search, color: Colors.grey),
+                        SizedBox(width: 10),
+                        Text(
+                          'Search Location...',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              FilterPage()), // Ensure you have this screen
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+                    width: screenSize.width * 0.15,
+                    height: screenSize.height * 0.0656,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.format_align_left_sharp),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: NearbyList(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SearchScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Search Screen'),
+      ),
+      body: Center(
+        child: Text('This is the search screen'),
       ),
     );
   }
