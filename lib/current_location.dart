@@ -150,6 +150,80 @@ class _CurrentLocationState extends State<CurrentLocation> {
             ),
           ),
           Positioned(
+            top: screenSize.height *
+                0.15, // Adjust the position based on your layout
+            left: 20,
+            right: 0,
+            child: Container(
+              height: screenSize.height * 0.06,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 180,
+                      height: 80,
+                      child: Row(children: [
+                        Icon(Icons.cable_rounded),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          "Mahindra e2oPluse",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Icon(Icons.arrow_downward_rounded)
+                      ]),
+                      margin: EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Container(
+                      width: 120,
+                      height: 80,
+                      margin: EdgeInsets.only(right: 10),
+                      child: Center(
+                          child: Text(
+                        'All Chargers',
+                        style: TextStyle(fontSize: 12),
+                      )),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    Container(
+                      width: 100,
+                      margin: EdgeInsets.only(right: 10),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.check_circle_outline,
+                            size: 12,
+                          ),
+                          Center(
+                              child: Text(
+                            'Available',
+                            style: TextStyle(fontSize: 12),
+                          )),
+                        ],
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
             bottom: 0,
             left: 0,
             right: 0,
