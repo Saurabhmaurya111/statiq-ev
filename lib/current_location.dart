@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:spark/bottom_navigation.dart';
+
 import 'package:spark/filter_page.dart';
 import 'package:spark/nearby_list.dart';
 
@@ -63,9 +65,10 @@ class _CurrentLocationState extends State<CurrentLocation> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
+      bottomNavigationBar: Bottom(),
       body: Stack(
         children: [
-          GoogleMap(
+           GoogleMap(
             initialCameraPosition: _kGooglePlex,
             zoomControlsEnabled: false,
             markers: Set<Marker>.of(_markers),

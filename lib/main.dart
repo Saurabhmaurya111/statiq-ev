@@ -5,11 +5,11 @@ import 'package:spark/current_location.dart';
 
 void main() {
 
-  runApp(const MyApp());
+runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+const MyApp({super.key});
 
 
   @override
