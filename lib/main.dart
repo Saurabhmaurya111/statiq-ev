@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:spark/current_location.dart';
+import 'package:spark/splash_screen.dart';
 
 
 void main() {
@@ -26,7 +27,7 @@ const MyApp({super.key});
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: CurrentLocation(),
+      home: SplashScreen(),
     );
   }
 }
