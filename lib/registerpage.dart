@@ -9,20 +9,21 @@ import 'package:spark/components/custom_textfield.dart';
 import 'package:spark/components/square_tile.dart';
 import 'package:spark/services/auth_services.dart';
 
-class LogInPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   final Function()?onTap;
-  LogInPage({super.key, required this.onTap});
+  RegisterPage({super.key, required this.onTap});
 
   @override
-  State<LogInPage> createState() => _LogInPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LogInPageState extends State<LogInPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
 
   final passwordController = TextEditingController();
+  final confirmedpasswordController = TextEditingController();
 
-  void signUserIn() async {
+  void signUserUp() async {
     showDialog(
       context: context,
       builder: (context) {
@@ -33,10 +34,15 @@ class _LogInPageState extends State<LogInPage> {
     );
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      if(passwordController.text == confirmedpasswordController.text){
+
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
+      }else{
+        showErrorMessage("Passwords don't match!");
+      }
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
@@ -61,20 +67,6 @@ class _LogInPageState extends State<LogInPage> {
     );
   }
 
-  // void wrongPasswordMessage() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return const AlertDialog(
-  //         title: Center(
-  //           child: Text(
-  //             'Incorrect Password',
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -88,12 +80,9 @@ class _LogInPageState extends State<LogInPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 40,
+                  height: 20,
                 ),
-                // Icon(
-                //   Icons.lock,
-                //   size: 80,
-                // ),
+              
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -114,10 +103,10 @@ class _LogInPageState extends State<LogInPage> {
                 ),
 
                 SizedBox(
-                  height: 50,
+                  height: 30,
                 ),
                 Text(
-                  "Login to your Account",
+                  "Create your Account",
                   style: TextStyle(
                       color: Color.fromARGB(255, 66, 66, 66), fontSize: 16),
                 ),
@@ -137,27 +126,24 @@ class _LogInPageState extends State<LogInPage> {
                   hintText: 'Password',
                   obscureText: true,
                 ),
+                SizedBox(
+                  height: 10,
+                ),
+                CustomTextfiled(
+                  controller: confirmedpasswordController,
+                  hintText: 'Confirmed Password',
+                  obscureText: true,
+                ),
                 const SizedBox(
                   height: 10,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "Forget Password?",
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ),
+               
                 SizedBox(
                   height: 25,
                 ),
                 CustomButton(
-                  text: "Sign In",
-                  onTap: signUserIn,
+                  text: "Sign Up",
+                  onTap: signUserUp,
                 ),
                 SizedBox(
                   height: 40,
@@ -175,7 +161,7 @@ class _LogInPageState extends State<LogInPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text(
-                          "Or sign in with",
+                          "Or sign up with",
                           style: TextStyle(color: Colors.grey[700]),
                         ),
                       ),
@@ -209,7 +195,7 @@ class _LogInPageState extends State<LogInPage> {
                       width: 15,
                     ),
                     SquareTile(
-                       onTap: (){
+                      onTap: (){
                         
                       },
                       imagePath: 'lib/images/apple.png'),
@@ -222,7 +208,7 @@ class _LogInPageState extends State<LogInPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Don't have an account?",
+                      "Already have an account?",
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                     const SizedBox(
@@ -231,7 +217,7 @@ class _LogInPageState extends State<LogInPage> {
                     GestureDetector(
                       onTap: widget.onTap,
                       child: Text(
-                        "Sign up",
+                        "Login now",
                         style: TextStyle(
                             color: const Color.fromRGBO(33, 150, 243, 1),
                             fontWeight: FontWeight.bold),
