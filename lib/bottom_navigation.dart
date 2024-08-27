@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spark/custom_navbar_option.dart';
+import 'package:spark/profile.dart';
+
 /* 
 
 
@@ -10,7 +12,7 @@ ONLY FOR THE DEMO PURPOSE ON MONDAY LOTS OF CHANGE HAS TO PERFORM
 
 
 
-*/ 
+*/
 class Bottom extends StatefulWidget {
   const Bottom({super.key});
 
@@ -98,9 +100,16 @@ class _BottomState extends State<Bottom> {
               ),
             ),
           ),
-          Flexible(
-            child: GestureDetector(
-              onTap: () => _onItemTapped(4),
+          GestureDetector(
+            onTap: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(),
+                  ),
+                );
+            },
+            child: Flexible(
               child: Custom_Navbar(
                 icon: Icon(
                   Icons.person_outline,

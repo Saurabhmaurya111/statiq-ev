@@ -46,6 +46,8 @@ dependencies:
   lottie: 
   firebase_auth: ^5.1.4
   google_sign_in: ^6.2.1
+  carousel_slider: ^4.2.1
+  another_carousel_pro: ^1.0.2
   
   # flutter_geocoder: ^0.2.2-nullsafety
 
