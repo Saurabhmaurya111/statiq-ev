@@ -17,7 +17,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     final currentUser = FirebaseAuth.instance.currentUser!;
-
+   
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SingleChildScrollView(
@@ -81,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         TextBox(
                           icon: Icon(
                             Icons.account_balance_wallet_rounded,
-                            
+                            size: 34,
                           ),
                           text: 'Wallet',
                           subtext: "₹ 0.00",
@@ -90,7 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         TextBox(
                           icon: Icon(
                             Icons.local_car_wash,
-                            
+                            size: 34,
                           ),
                           text: 'Green Kms',
                           subtext: '0 km',

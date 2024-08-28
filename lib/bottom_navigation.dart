@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:spark/custom_navbar_option.dart';
-import 'package:spark/profile.dart';
+import 'package:spark/pages/profile.dart';
+import 'package:spark/pages/trips.dart';
+
 
 /* 
 
@@ -72,6 +74,13 @@ class _BottomState extends State<Bottom> {
           ),
           Flexible(
             child: GestureDetector(
+              onTap: () {Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TripPage(),
+                ),
+              );
+              },
               child: Custom_Navbar(
                 icon: Icon(
                   Icons.trending_up_sharp,
@@ -80,16 +89,16 @@ class _BottomState extends State<Bottom> {
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
+          Flexible(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ProfilePage(),
                 ),
               );
-            },
-            child: Flexible(
+              },
               child: Custom_Navbar(
                 icon: Icon(
                   Icons.person_outline,
