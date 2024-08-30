@@ -5,9 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:spark/bottom_navigation.dart';
-
-import 'package:spark/filter_page.dart';
-import 'package:spark/nearby_list.dart';
+import 'package:http/http.dart' as http;
 
 class TripPage extends StatefulWidget {
   const TripPage({super.key});
@@ -178,7 +176,7 @@ class _CurrentLocationState extends State<TripPage> {
                     "Tackle your range anxirty with our hassle - free chaging experience on your next trip.",
                     style: TextStyle(fontSize: 12 , color: Colors.grey[600]),
                   ),
-                  
+                
                 ],
               ),
             ),

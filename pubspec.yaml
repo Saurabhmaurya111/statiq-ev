@@ -48,6 +48,7 @@ dependencies:
   google_sign_in: ^6.2.1
   carousel_slider: ^4.2.1
   another_carousel_pro: ^1.0.2
+  google_place: 
   
   # flutter_geocoder: ^0.2.2-nullsafety
 
