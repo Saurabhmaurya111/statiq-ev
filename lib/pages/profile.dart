@@ -17,7 +17,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     final currentUser = FirebaseAuth.instance.currentUser!;
-   
+    final String? displayName = currentUser?.displayName;
+    final String firstLetter = getFirstLetterOfDisplayName(displayName);
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SingleChildScrollView(
@@ -48,9 +49,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       child: Center(
                         child: Text(
-                          "SM",
+                          firstLetter,
                           style: TextStyle(
-                              fontSize: 35, fontWeight: FontWeight.w500),
+                              fontSize: 50, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
@@ -174,4 +175,10 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+   String getFirstLetterOfDisplayName(String? displayName) {
+    if (displayName == null || displayName.isEmpty) return 'N/A';
+
+    return displayName[0].toUpperCase();
+  }
+
 }

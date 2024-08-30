@@ -1,15 +1,12 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:spark/bottom_navigation.dart';
-import 'dart:convert';
-import 'package:spark/filter_page.dart';
-import 'package:spark/nearby_list.dart';
-import 'package:spark/searchScreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:spark/bottom_navigation.dart';
+import 'package:spark/filter_page.dart';
+import 'package:spark/searchScreen.dart';
 
 class CurrentLocation extends StatefulWidget {
   const CurrentLocation({super.key});
@@ -23,17 +20,17 @@ class _CurrentLocationState extends State<CurrentLocation> {
   LatLng? _currentPosition;
   GoogleMapController? _mapController;
   List<Map<String, dynamic>> locations = [];
+  final Set<Marker> _markers = {};
+
   static const _kGooglePlex = CameraPosition(
     target: LatLng(28.375724999658214, 79.45794690859752),
     zoom: 15,
   );
 
-  final List<Marker> _markers = <Marker>[];
-
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation(); // Corrected: Start by getting the current location
+    _getCurrentLocation();
   }
 
   Future<void> _fetchLocations() async {
@@ -48,7 +45,6 @@ class _CurrentLocationState extends State<CurrentLocation> {
 
     try {
       final response = await http.get(url, headers: headers);
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -59,14 +55,15 @@ class _CurrentLocationState extends State<CurrentLocation> {
             };
           }).toList();
 
-          // Add markers for each location
-          _markers.addAll(locations.map((loc) {
-            return Marker(
-              markerId: MarkerId(loc['name']),
-              position: loc['latLng'],
-              infoWindow: InfoWindow(title: loc['name']),
-            );
-          }).toList());
+          _markers.addAll(
+            locations.map((loc) {
+              return Marker(
+                markerId: MarkerId(loc['name']),
+                position: loc['latLng'],
+                infoWindow: InfoWindow(title: loc['name']),
+              );
+            }).toSet(),
+          );
         });
       } else {
         print('Failed to fetch data: ${response.reasonPhrase}');
@@ -77,18 +74,12 @@ class _CurrentLocationState extends State<CurrentLocation> {
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
+    if (!await Geolocator.isLocationServiceEnabled()) {
       print('Location services are disabled.');
       return;
     }
 
-    // Check for location permissions
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.whileInUse &&
@@ -98,26 +89,28 @@ class _CurrentLocationState extends State<CurrentLocation> {
       }
     }
 
-    // Get the current position
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _currentPosition = LatLng(position.latitude, position.longitude);
-         _markers.add(
-        Marker(
-          markerId: MarkerId('currentLocation'),
-          position: _currentPosition!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          infoWindow: InfoWindow(title: 'Current Location'),
-        ),
+        desiredAccuracy: LocationAccuracy.high,
       );
-      });
-      _fetchLocations(); // Fetch locations after getting the current location
+      final newPosition = LatLng(position.latitude, position.longitude);
 
-      // Animate camera to current location
+      setState(() {
+        _currentPosition = newPosition;
+        _markers.add(
+          Marker(
+            markerId:const MarkerId('currentLocation'),
+            position: newPosition,
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            infoWindow:const InfoWindow(title: 'Current Location'),
+          ),
+        );
+      });
+
+      await _fetchLocations();
+
       if (_mapController != null) {
-        _animateToLocation(_currentPosition!);
+        _animateToLocation(newPosition);
       }
     } catch (e) {
       print('Error getting current location: $e');
@@ -138,7 +131,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
           GoogleMap(
             initialCameraPosition: _kGooglePlex,
             zoomControlsEnabled: false,
-            markers: Set<Marker>.of(_markers),
+            markers: _markers,
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
               _mapController = controller;
@@ -150,67 +143,9 @@ class _CurrentLocationState extends State<CurrentLocation> {
             right: 20,
             child: Row(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SearchScreen()),
-                    );
-                  },
-                  child: Container(
-                    width: screenSize.width * 0.7,
-                    height: screenSize.height * 0.0656,
-                    margin: EdgeInsets.only(left: 0),
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search, color: Colors.grey),
-                        SizedBox(width: 10),
-                        Text(
-                          'Search Location...',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                _buildSearchButton(context, screenSize),
                 SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => FilterPage()),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 5),
-                    width: screenSize.width * 0.15,
-                    height: screenSize.height * 0.0656,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Icon(Icons.format_align_left_sharp),
-                  ),
-                )
+                _buildFilterButton(context, screenSize),
               ],
             ),
           ),
@@ -223,62 +158,7 @@ class _CurrentLocationState extends State<CurrentLocation> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: [
-                    Container(
-                      width: 180,
-                      height: 80,
-                      child: Row(children: [
-                        Icon(Icons.cable_rounded),
-                        SizedBox(width: 5),
-                        Text(
-                          "Mahindra e2oPluse",
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        SizedBox(width: 5),
-                        Icon(Icons.arrow_downward_rounded)
-                      ]),
-                      margin: EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    Container(
-                      width: 120,
-                      height: 80,
-                      margin: EdgeInsets.only(right: 10),
-                      child: Center(
-                          child: Text(
-                        'All Chargers',
-                        style: TextStyle(fontSize: 12),
-                      )),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    Container(
-                      width: 100,
-                      margin: EdgeInsets.only(right: 10),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline,
-                            size: 12,
-                          ),
-                          Center(
-                              child: Text(
-                            'Available',
-                            style: TextStyle(fontSize: 12),
-                          )),
-                        ],
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ],
+                  children: _buildFilterChips(screenSize),
                 ),
               ),
             ),
@@ -288,17 +168,13 @@ class _CurrentLocationState extends State<CurrentLocation> {
             left: 0,
             right: 0,
             child: Container(
-              height: screenSize.height * 0.1, // Adjust the height as needed
-              margin: EdgeInsets.only(
-                left: 10,
-                right: 10,
-               
-              ), // Add margin
-              padding: EdgeInsets.only(top: 3.0 , bottom: 5), // Add padding for inner content
+              height: screenSize.height * 0.1,
+              margin:const EdgeInsets.symmetric(horizontal: 10),
+              padding:const EdgeInsets.symmetric(vertical: 3.0),
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: [
+                boxShadow:const [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 10,
@@ -307,43 +183,138 @@ class _CurrentLocationState extends State<CurrentLocation> {
                 ],
               ),
               child: ListView.builder(
-                scrollDirection:
-                    Axis.horizontal, // Set horizontal scroll direction
+                scrollDirection: Axis.horizontal,
                 itemCount: locations.length,
                 itemBuilder: (context, index) {
-                  return Container(
-                    width: screenSize.width * 0.7,
-                    height: screenSize.height * 0.0656,
-                    margin: EdgeInsets.only(left: 0, right: 10),
-                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white,
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        locations[index]['name'],
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold, // Make text bold
-                          color: Colors.black, // Text color
-                        ),
-                      ),
-                      onTap: () =>
-                          _animateToLocation(locations[index]['latLng']),
-                    ),
-                  );
+                  return _buildLocationTile(context, screenSize, index);
                 },
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSearchButton(BuildContext context, Size screenSize) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SearchScreen()),
+        );
+      },
+      child: Container(
+        width: screenSize.width * 0.7,
+        height: screenSize.height * 0.0656,
+        padding:const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow:const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child:const Row(
+          children: [
+            Icon(Icons.search, color: Colors.grey),
+            SizedBox(width: 10),
+            Text(
+              'Search Location...',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(BuildContext context, Size screenSize) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => FilterPage()),
+        );
+      },
+      child: Container(
+        padding:const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+        width: screenSize.width * 0.15,
+        height: screenSize.height * 0.0656,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow:const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child:const Icon(Icons.format_align_left_sharp),
+      ),
+    );
+  }
+
+  List<Widget> _buildFilterChips(Size screenSize) {
+    return [
+      _buildChip('Mahindra e2oPluse', screenSize, 180),
+      _buildChip('All Chargers', screenSize, 120),
+      _buildChip('Available', screenSize, 100),
+    ];
+  }
+
+  Widget _buildChip(String text, Size screenSize, double width) {
+    return Container(
+      width: width,
+      height: 80,
+      margin:const EdgeInsets.only(right: 10),
+      child: Center(
+        child: Row(
+          children: [
+            if (text == 'Available') ...[
+            const  Icon(Icons.check_circle_outline, size: 12),
+             const SizedBox(width: 5),
+            ],
+            Text(text, style: TextStyle(fontSize: 12)),
+          ],
+        ),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
+  }
+
+  Widget _buildLocationTile(BuildContext context, Size screenSize, int index) {
+    return Container(
+      width: screenSize.width * 0.7,
+      height: screenSize.height * 0.0656,
+      margin:const EdgeInsets.only(right: 10),
+      padding:const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow:const [
+          BoxShadow(
+            color: Colors.white,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: ListTile(
+        title: Text(
+          locations[index]['name'],
+          style:const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        onTap: () => _animateToLocation(locations[index]['latLng']),
       ),
     );
   }
