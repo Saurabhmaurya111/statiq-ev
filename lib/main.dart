@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:spark/login_page.dart';
 import 'package:spark/pages/polylines.dart';
 import 'package:spark/pages/profile.dart';
 import 'package:spark/slider_screen.dart';
@@ -36,6 +37,7 @@ const MyApp({super.key});
         useMaterial3: true,
       ),
       home: SplashScreen(),  
+     
 
       // home: EVChargeFinderPage(),
       

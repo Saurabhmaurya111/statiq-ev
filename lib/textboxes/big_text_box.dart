@@ -5,12 +5,14 @@ class BigTextBox extends StatefulWidget {
   final String mainName;
   final String sub;
   final String sub2;
+  final void Function()? sub2OnTap;
   const BigTextBox(
       {super.key,
       required this.mainIcon,
       required this.mainName,
       required this.sub,
-      required this.sub2});
+      required this.sub2,
+      this.sub2OnTap});
 
   @override
   State<BigTextBox> createState() => _BigTextBoxState();
@@ -38,7 +40,7 @@ class _BigTextBoxState extends State<BigTextBox> {
         children: [
           Row(
             children: [
-             widget.mainIcon,
+              widget.mainIcon,
               SizedBox(
                 width: 10,
               ),
@@ -68,13 +70,16 @@ class _BigTextBoxState extends State<BigTextBox> {
           SizedBox(
             height: 5,
           ),
-          Row(
-            children: [
-              Text(widget.sub2),
-              Spacer(),
-              Icon(Icons.arrow_forward_ios_rounded),
-            ],
-          )
+          GestureDetector(
+            onTap: widget.sub2OnTap,
+            child: Row(
+              children: [
+                Text(widget.sub2),
+                Spacer(),
+                Icon(Icons.arrow_forward_ios_rounded),
+              ],
+            ),
+          ),
         ],
       ),
     );

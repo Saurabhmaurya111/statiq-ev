@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:spark/login_page.dart';
 import 'package:spark/textboxes/big_text_box.dart';
 import 'package:spark/textboxes/single_text_box.dart';
 import 'package:spark/textboxes/text_box.dart';
@@ -15,9 +16,24 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    // final user = FirebaseAuth.instance.currentUser!;
+    void userSignout() {
+      FirebaseAuth.instance.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LogInPage(
+            onTap: () {
+              // print('Hello Saurabh Logout is called ');
+            },
+          ),
+        ),
+      );
+    }
+
     Size screenSize = MediaQuery.of(context).size;
     final currentUser = FirebaseAuth.instance.currentUser!;
-    final String? displayName = currentUser?.displayName;
+    final String? displayName = currentUser.displayName;
     final String firstLetter = getFirstLetterOfDisplayName(displayName);
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -67,10 +83,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Text(
                       "${currentUser.displayName}",
-                      style: TextStyle(
-                          
-                          fontSize: 25,
-                          fontWeight: FontWeight.w900),
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
                     ),
                     Text(
                       currentUser.email!,
@@ -145,11 +159,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       text: 'Notifications',
                     ),
                     const SizedBox(height: 10),
-                    const BigTextBox(
-                        mainIcon: Icon(Icons.settings_outlined),
-                        mainName: 'Account',
-                        sub: 'Account Privacy',
-                        sub2: 'Logout'),
+                    BigTextBox(
+                      mainIcon: Icon(Icons.settings_outlined),
+                      mainName: 'Account',
+                      sub: 'Account Privacy',
+                      sub2: 'Logout',
+                      sub2OnTap: userSignout,
+                    ),
                     const SizedBox(height: 20),
                     Container(
                       child: Column(
@@ -175,10 +191,10 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-   String getFirstLetterOfDisplayName(String? displayName) {
+
+  String getFirstLetterOfDisplayName(String? displayName) {
     if (displayName == null || displayName.isEmpty) return 'N/A';
 
     return displayName[0].toUpperCase();
   }
-
 }
